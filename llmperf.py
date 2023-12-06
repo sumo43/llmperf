@@ -1,3 +1,4 @@
+import requests
 import argparse
 from collections import defaultdict
 import ray, openai
@@ -18,7 +19,8 @@ FRAMEWORKS = [
     "perplexity",
     "together",
     "vllm",
-    "tgi"
+    "tgi",
+    "triton"
 ]
 
 os.environ["TOKENIZERS_PARALLELISM"] = "true"
@@ -136,6 +138,28 @@ def validate(ep_config, sample_lines):
                             ttft = time.time() - st
                         words += delta["content"]
             et = time.time()
+        except Exception as e:
+            return ("Exception", -1, -1, -1, -1, str(e), "")
+    elif ep_config["framework"] == "triton":
+        # triton generate api v1
+        try:
+            st = time.time()
+            url = ep_config["api_base"]
+            payload = {
+                    "text_input": sys_prompt + prompt,
+                    "max_new_tokens": 384,
+
+            }
+            headers = {
+                "accept": "application/json",
+                "content-type": "application/json",
+            }
+
+            response = requests.post(url, json=payload, headers=headers)
+            response.raise_for_status()
+            words = response.json()["text_output"][len((sys_prompt + prompt)):]
+            et = time.time()
+
         except Exception as e:
             return ("Exception", -1, -1, -1, -1, str(e), "")
     elif ep_config["framework"] == "together":
@@ -468,6 +492,9 @@ if __name__ == "__main__":
     elif args.framework == "tgi":
         endpoint_config["api_base"]=os.environ["TGI_API_BASE"]
         endpoint_config["api_key"]=os.environ["TGI_API_KEY"]
+    elif args.framework == "triton":
+        endpoint_config["api_base"] = "http://localhost:8000/v2/models/add_sub/generate"
+        endpoint_config["api_key"] = ""
 
     endpoint_config["framework"] = args.framework
     endpoint_config["model"] = args.model
