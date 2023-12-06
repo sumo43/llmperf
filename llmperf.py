@@ -150,12 +150,7 @@ def validate(ep_config, sample_lines):
                     "max_new_tokens": 384,
 
             }
-            headers = {
-                "accept": "application/json",
-                "content-type": "application/json",
-            }
-
-            response = requests.post(url, json=payload, headers=headers)
+            response = requests.post(url, json=payload)
             response.raise_for_status()
             words = response.json()["text_output"][len((sys_prompt + prompt)):]
             et = time.time()
@@ -292,7 +287,8 @@ def endpoint_evaluation(ep_config, sample_lines):
             for _ in range(args.concur_requests)
         ]
         results = ray.get(futures)
-        query_results.extend(results)
+        if i != 0:
+            query_results.extend(results)
         et = time.time()
         elt = et - st
         tosleep = args.sleep - elt
