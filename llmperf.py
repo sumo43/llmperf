@@ -127,7 +127,7 @@ def validate(ep_config, sample_lines):
                 # Please keep temp at 0. Otherwise increases the number of mismatches.
                 temperature=0,
                 # Do not set to false. You will get bogus results.
-                stream=True,
+                stream=False,
             )
             for tok in response:
                 id = tok.id
@@ -396,7 +396,7 @@ if __name__ == "__main__":
         "-m",
         "--model",
         type=str,
-        default="meta-llama/Llama-2-70b-chat-hf",
+        default="model",
         help="model name",
     )
     parser.add_argument(
