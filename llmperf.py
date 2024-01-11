@@ -129,6 +129,9 @@ def validate(ep_config, sample_lines):
                 # Do not set to false. You will get bogus results.
                 stream=False,
             )
+
+            print(response)
+            exit(0)
             for tok in response:
                 id = tok.id
                 if tok.choices[0].delta:
