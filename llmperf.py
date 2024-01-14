@@ -129,17 +129,8 @@ def validate(ep_config, sample_lines):
                 # Do not set to false. You will get bogus results.
                 stream=False,
             )
-
-            print(response)
-            exit(0)
-            for tok in response:
-                id = tok.id
-                if tok.choices[0].delta:
-                    delta = tok.choices[0].delta
-                    if "content" in delta:
-                        if ttft == 0:
-                            ttft = time.time() - st
-                        words += delta["content"]
+            print(args.max_tokens)
+            words += response.choices[0].message.content
             et = time.time()
         except Exception as e:
             return ("Exception", -1, -1, -1, -1, str(e), "")
@@ -151,7 +142,6 @@ def validate(ep_config, sample_lines):
             payload = {
                     "text_input": sys_prompt + prompt,
                     "max_new_tokens": 384,
-
             }
             response = requests.post(url, json=payload)
             response.raise_for_status()
