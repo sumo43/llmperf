@@ -10,6 +10,12 @@ import pandas as pd
 from transformers import LlamaTokenizerFast
 from huggingface_hub import InferenceClient
 
+os.environ["VLLM_API_BASE"] = "http://localhost:8000/v1"
+os.environ["VLLM_API_KEY"] = "e"
+
+# set some random env vars
+
+
 FRAMEWORKS = [
     "anyscale",
     "openai",
